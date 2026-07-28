@@ -1,14 +1,28 @@
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-pvc
+
+---
+
+apiVersion: v1
 kind: Pod
 metadata:
   name: quarkus-kafka-sandbox-pod
-
 spec:
   containers:
     - name: consumer
       image: consumer:latest
       ports:
         - containerPort: 8080
+          hostPort: 8080
       env:
         - name: KAFKA_URL
           value: localhost:9092
@@ -25,8 +39,6 @@ spec:
 
     - name: producer
       image: producer:latest
-      ports:
-        - containerPort: 8081
       env:
         - name: KAFKA_URL
           value: localhost:9092
@@ -36,7 +48,7 @@ spec:
           memory: 500Mi
 
     - name: postgres
-      image: postgres:17-alpine
+      image: docker.io/postgres:17-alpine
       ports:
         - containerPort: 5432
           hostPort: 5432
@@ -51,11 +63,12 @@ spec:
         limits:
           cpu: 0.5
           memory: 500Mi
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
+      volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
 
     - name: kafka
-      image: apache/kafka:3.8.0
+      image: docker.io/apache/kafka:3.8.0
       ports:
         - containerPort: 9092
           hostPort: 9092
@@ -65,9 +78,9 @@ spec:
         - name: KAFKA_PROCESS_ROLES
           value: broker,controller
         - name: KAFKA_LISTENERS
-          value: CONTROLLER://:9093,PLAINTEXT_HOST://:9092
+          value: CONTROLLER://:9093,PLAINTEXT://:9092
         - name: KAFKA_ADVERTISED_LISTENERS
-          value: PLAINTEXT_HOST://localhost:9092
+          value: PLAINTEXT://localhost:9092
         - name: KAFKA_CONTROLLER_LISTENER_NAMES
           value: CONTROLLER
         - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
@@ -88,15 +101,18 @@ spec:
         limits:
           cpu: 0.5
           memory: 500Mi
-      volumes:
-        - kafka_data:/var/lib/kafka/data
+      volumeMounts:
+        - name: kafka-data
+          mountPath: /var/lib/kafka/data
 
     - name: kafka-ui
-      image: provectuslabs/kafka-ui:latest
+      image: docker.io/provectuslabs/kafka-ui:latest
       ports:
-        - containerPort: 8080
+        - containerPort: 8081
           hostPort: 8081
       env:
+        - name: SERVER_PORT
+          value: 8081
         - name: KAFKA_CLUSTERS_0_NAME
           value: local
         - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
@@ -107,5 +123,9 @@ spec:
           memory: 500Mi
 
   volumes:
-    - name: postgres_data
-    - name: kafka_data
+    - name: postgres-data
+      persistentVolumeClaim:
+        claimName: postgres-pvc
+    - name: kafka-data
+      persistentVolumeClaim:
+        claimName: kafka-pvc
