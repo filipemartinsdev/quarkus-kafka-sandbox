@@ -79,4 +79,6 @@ podman play kube kube.yaml
 make up
 ```
 
+> Stop with `make down`
+
 ---
