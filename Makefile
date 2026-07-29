@@ -1,10 +1,13 @@
-.PHONY: up down build
+.PHONY: up down build start
 
 build:
 	podman build -t producer:latest ./producer
 	podman build -t consumer:latest ./consumer
 
 up: build
+	podman play kube kube.yaml
+
+start:
 	podman play kube kube.yaml
 
 down:
