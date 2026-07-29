@@ -1,6 +1,7 @@
 package sandbox.consumer.infra.web;
 
 import io.github.responsekit.core.PagedResponse;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -21,7 +22,7 @@ public class NotificationResource {
 
     @GET
     public RestResponse<PagedResponse<NotificationResponse>> getAll(
-            @RestQuery int page, @RestQuery int size
+            @RestQuery @DefaultValue("0") int page, @RestQuery @DefaultValue("20") int size
     ){
         return RestResponse.ok(
                 notificationService.getAll(page, size)
