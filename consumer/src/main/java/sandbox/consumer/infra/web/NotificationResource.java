@@ -10,8 +10,8 @@ import org.jboss.resteasy.reactive.RestResponse;
 import sandbox.consumer.application.dto.NotificationResponse;
 import sandbox.consumer.application.service.NotificationService;
 
-@Produces("application/json")
-@Path(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+@Path("/api/notifications")
 public class NotificationResource {
     private final NotificationService notificationService;
 
