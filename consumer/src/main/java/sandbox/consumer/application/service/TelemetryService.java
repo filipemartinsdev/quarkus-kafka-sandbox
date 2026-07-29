@@ -1,19 +1,14 @@
 package sandbox.consumer.application.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sandbox.consumer.application.dto.event.TemperatureAlertEvent;
 import sandbox.consumer.infra.cache.TemperatureAlertCacheStorage;
 
 @ApplicationScoped
 public class TelemetryService {
-    private static final Logger log = LoggerFactory.getLogger(TelemetryService.class);
     private final TemperatureAlertCacheStorage temperatureAlertCacheStorage;
     private final NotificationService notificationService;
 
-    @Inject
     public TelemetryService(TemperatureAlertCacheStorage temperatureAlertCacheStorage, NotificationService notificationService) {
         this.temperatureAlertCacheStorage = temperatureAlertCacheStorage;
         this.notificationService = notificationService;
