@@ -11,7 +11,7 @@ Study project implementing Apache Kafka using Quarkus.
 - PostgreSQL 17
 - Apache Kafka 3.8 (KRaft)
 - KafkaUI
-- Docker/Podman
+- Docker
 
 ## Domain
 
@@ -36,49 +36,13 @@ All alerts can be found on `http://localhost:8080/api/notifications`.
 
 ## How to execute
 
-- KafkaUI will be available on `http://localhost:8081`.
-- Notification service will be available on `http://localhost:8080`
-
----
-
-### Using Docker
-
-1. Start all services
-
 ```bash
 docker compose up -d --build
 ```
 
-> Stop with `docker compose down`
----
 
-### Using Podman
 
-1. Build images
-
-```bash
-podman build -t consumer:latest ./consumer
-podman build -t producer:latest ./producer
-```
-
-2. Start pod
-
-```bash
-podman play kube kube.yaml
-```
-
-> Stop with `podman play kube --down kube.yaml`
-
----
-
-### Using Podman + Makefile
-
-1. Up services
-
-```bash
-make up
-```
-
-> Stop with `make down`
+- KafkaUI will be available on `http://localhost:8081`.
+- Notification service will be available on `http://localhost:8080`
 
 ---
