@@ -57,8 +57,11 @@ public class KafkaConfig {
                 Consumed.with(Serdes.String(), eventSerde)
         );
 
-//        Step 4: Sliding Window of 1 minute
-        TimeWindows timeWindows = TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(1));
+
+//        Step 4: Tumbling Window of 1 minute
+        var windowSize = Duration.ofMinutes(1);
+        var gracePeriod = Duration.ofSeconds(10);
+        var tumblingWindow = TimeWindows.ofSizeAndGrace(windowSize, gracePeriod);
 
 //        Step 5: Pipeline definition
         sourceStream
@@ -67,7 +70,7 @@ public class KafkaConfig {
                         Grouped.with(Serdes.String(), eventSerde)
                 )
 
-                .windowedBy(timeWindows)
+                .windowedBy(tumblingWindow)
 
                 .aggregate(
                         () -> new TemperatureAccumulator(0.0f, 0),
@@ -76,6 +79,8 @@ public class KafkaConfig {
                         },
                         Materialized.with(Serdes.String(), accumSerde)
                 )
+
+                .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()))
 
                 .toStream()
 
@@ -123,6 +128,7 @@ public class KafkaConfig {
                     new NewTopic("sensor.temperature.updated", 3, (short) 1),
                     new NewTopic("sensor.temperature.alerts", 1, (short) 1)
             ));
+            log.info("Kafka topics created successfully");
         } catch (Exception e){
             log.warn("Kafka topic creation interrupted");
         }
